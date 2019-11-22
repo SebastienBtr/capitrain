@@ -92,4 +92,5 @@ my_ip = socket.gethostbyname(host_name)
 cap = pyshark.FileCapture('capture.pcap')
 cap.apply_on_packets(analyze_packets)
 
+# TODO: do a push_data for all the remaining streams in packet_dict
 print('done')
