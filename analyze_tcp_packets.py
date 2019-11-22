@@ -6,6 +6,7 @@ def analyze_packets(pkt):
     if ('TCP' in pkt and 'IP' in pkt):
         # time when the packet was received
         timestamp = float(pkt.sniff_timestamp)
+        
         # If we already have the stream in the dict or not
         if (pkt.tcp.stream not in packet_dict):
             # Get the remote ip of the stream
@@ -18,13 +19,12 @@ def analyze_packets(pkt):
             # Based on the average delta time we split the packets
             if (average_delta != 0 and time_delta > average_delta * 3):
                 push_data(pkt.tcp.stream)
+                del packet_dict[pkt.tcp.stream]
             else:
                 # Update the delta average
                 sum_delta = packet_dict[pkt.tcp.stream]['sumDelta'] + time_delta
                 number_of_packets = packet_dict[pkt.tcp.stream]['numberOfPackets'] + 1
                 average_delta = sum_delta / number_of_packets
-                print(time_delta)
-                print(average_delta)
 
                 # Save the new data of the stream
                 packet_dict[pkt.tcp.stream]['endTime'] = timestamp
@@ -37,7 +37,7 @@ def analyze_packets(pkt):
 
 # Get the size in MB of a packet
 def get_packet_size(pkt):
-    return float(pkt.tcp.len) * 0.000001
+    return int(pkt.length.raw_value, 16) * 0.000001
 
 # Save a new stream and its first packet in the dict
 def save_new_stream(stream_id, timestamp, ip, pkt):
@@ -55,9 +55,8 @@ def save_new_stream(stream_id, timestamp, ip, pkt):
 
 # Send a group of packets that seems to be together to the DB
 def push_data(key):
-    print('push data===================================')
+    print('push data: ' + str(key))
     # TODO: save in DB
-    del packet_dict[key]
 
 # Reverse DNS a remote IP
 def reverse_dns(ip):
@@ -66,7 +65,6 @@ def reverse_dns(ip):
         reversed_dns = socket.gethostbyaddr(ip)
         return reversed_dns[0]
     except:
-        print("No DNS found")
         return ""
 
 
@@ -92,5 +90,8 @@ my_ip = socket.gethostbyname(host_name)
 cap = pyshark.FileCapture('capture.pcap')
 cap.apply_on_packets(analyze_packets)
 
-# TODO: do a push_data for all the remaining streams in packet_dict
+# We push_data all the remaining streams in packet_dict
+for key in packet_dict:
+  push_data(key)
+  
 print('done')
