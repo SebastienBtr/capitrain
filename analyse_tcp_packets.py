@@ -1,7 +1,7 @@
 import pyshark
 import socket
 import os
-from db import connectToCluster, saveOnePacket
+from db import connect_to_cluster, save_element
 
 LISTENED_IP = os.getenv('LISTENED_IP')
 
@@ -60,7 +60,7 @@ def save_new_stream(stream_id, timestamp, ip, pkt):
 # Send a group of packets that seems to be together to the DB
 def push_data(key):
     print('Push data: ' + str(packet_dict[key]))
-    saveOnePacket(packet_dict[key])
+    save_element(packet_dict[key])
 
 # Reverse DNS a remote IP
 def reverse_dns(ip):
@@ -87,7 +87,7 @@ def reverse_dns(ip):
 packet_dict = {}
 
 # Connect to MongoDB cluster
-connectToCluster()
+connect_to_cluster()
 
 cap = pyshark.FileCapture('capture.pcap')
 cap.apply_on_packets(analyse_packets)
