@@ -19,7 +19,7 @@
 
 ## Explored possibilities and solution provided
 
-### MITM atack with a Proxy
+### MITM attack with a Proxy
 
 // TODO:
 
