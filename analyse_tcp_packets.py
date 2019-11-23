@@ -1,12 +1,15 @@
 import pyshark
 import socket
+from db import connectToCluster, saveOnePacket
 
 # Analyze a pkt to save it in the good key of our date structure
+
+
 def analyze_packets(pkt):
     if ('TCP' in pkt and 'IP' in pkt):
         # time when the packet was received
         timestamp = float(pkt.sniff_timestamp)
-        
+
         # If we already have the stream in the dict or not
         if (pkt.tcp.stream not in packet_dict):
             # Get the remote ip of the stream
@@ -40,6 +43,8 @@ def get_packet_size(pkt):
     return int(pkt.length.raw_value, 16) * 0.000001
 
 # Save a new stream and its first packet in the dict
+
+
 def save_new_stream(stream_id, timestamp, ip, pkt):
     domain = reverse_dns(ip)
     packet_dict[stream_id] = {
@@ -54,11 +59,15 @@ def save_new_stream(stream_id, timestamp, ip, pkt):
     }
 
 # Send a group of packets that seems to be together to the DB
+
+
 def push_data(key):
-    print('push data: ' + str(key))
-    # TODO: save in DB
+    print('Push data: ' + str(packet_dict[key]))
+    saveOnePacket(packet_dict[key])
 
 # Reverse DNS a remote IP
+
+
 def reverse_dns(ip):
     # TODO: find a better reverse DNS
     try:
@@ -83,6 +92,9 @@ def reverse_dns(ip):
 } """
 packet_dict = {}
 
+# Connect to MongoDB cluster
+connectToCluster()
+
 # Get host IP
 host_name = socket.gethostname()
 my_ip = socket.gethostbyname(host_name)
@@ -92,6 +104,6 @@ cap.apply_on_packets(analyze_packets)
 
 # We push_data all the remaining streams in packet_dict
 for key in packet_dict:
-  push_data(key)
-  
+    push_data(key)
+
 print('done')

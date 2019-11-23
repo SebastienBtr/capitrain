@@ -1,6 +1,13 @@
 FROM ubuntu:18.04
 
+ARG mongoDbUser
+ARG mongoDbPassword
+ARG listenedIp
+
+ENV MONGO_DB_USER $mongoDbUser
+ENV MONGO_DB_PASSWORD $mongoDbPassword
 ENV DEBIAN_FRONTEND noninteractive
+ENV LISTENED_IP $listenedIp
 
 COPY requirements.txt sniffer.py analyze_tcp_packets.py ./
 
