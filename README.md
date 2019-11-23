@@ -23,7 +23,7 @@
 
 // TODO:
 
-### Packets sniffer with a TShark wrapper
+### Network sniffer with a TShark wrapper
 
 // TODO:
 
