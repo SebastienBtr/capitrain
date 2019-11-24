@@ -1,7 +1,7 @@
 import pyshark
 import socket
 import os
-from db import connect_to_cluster, save_element
+from db import save_element
 
 LISTENED_IP = os.getenv('LISTENED_IP')
 
@@ -93,9 +93,6 @@ def reverse_dns(ip):
   }
 } """
 packet_dict = {}
-
-# Connect to MongoDB cluster
-connect_to_cluster()
 
 cap = pyshark.FileCapture('./capture.pcap')
 cap.apply_on_packets(analyse_packets)
