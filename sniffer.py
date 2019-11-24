@@ -10,10 +10,4 @@ filter = "tcp&&(ip.dst==" + LISTENED_IP + "||ip.src==" + LISTENED_IP + ")"
 capture = pyshark.LiveCapture(
     interface="en0", output_file="./capture.pcap", display_filter=filter)
 
-
-def print_callback(pkt):
-    print(pkt)
-
-
-capture.apply_on_packets(print_callback, timeout=SNIFFER_TIMEOUT)
-capture.sniff()
+capture.sniff(timeout=SNIFFER_TIMEOUT)

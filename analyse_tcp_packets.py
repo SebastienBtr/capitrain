@@ -5,7 +5,7 @@ from db import connect_to_cluster, save_element
 
 LISTENED_IP = os.getenv('LISTENED_IP')
 
-# Analyze a pkt to save it in the good key of our date structure
+# Analyse a pkt to save it in the good key of our date structure
 def analyse_packets(pkt):
     if ('TCP' in pkt and 'IP' in pkt):
         # time when the packet was received
