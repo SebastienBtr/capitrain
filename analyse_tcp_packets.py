@@ -6,6 +6,8 @@ from db import connect_to_cluster, save_element
 LISTENED_IP = os.getenv('LISTENED_IP')
 
 # Analyse a pkt to save it in the good key of our date structure
+
+
 def analyse_packets(pkt):
     if ('TCP' in pkt and 'IP' in pkt):
         # time when the packet was received
@@ -44,6 +46,8 @@ def get_packet_size(pkt):
     return int(pkt.length.raw_value, 16) * 0.000001
 
 # Save a new stream and its first packet in the dict
+
+
 def save_new_stream(stream_id, timestamp, ip, pkt):
     domain = reverse_dns(ip)
     packet_dict[stream_id] = {
@@ -58,11 +62,15 @@ def save_new_stream(stream_id, timestamp, ip, pkt):
     }
 
 # Send a group of packets that seems to be together to the DB
+
+
 def push_data(key):
     print('Push data: ' + str(packet_dict[key]))
     save_element(packet_dict[key])
 
 # Reverse DNS a remote IP
+
+
 def reverse_dns(ip):
     try:
         reversed_dns = socket.gethostbyaddr(ip)
@@ -89,7 +97,7 @@ packet_dict = {}
 # Connect to MongoDB cluster
 connect_to_cluster()
 
-cap = pyshark.FileCapture('capture.pcap')
+cap = pyshark.FileCapture('./capture.pcap')
 cap.apply_on_packets(analyse_packets)
 
 # We push_data all the remaining streams in packet_dict
