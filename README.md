@@ -10,8 +10,7 @@
 
 ## Installation
 
-* // TODO: installation guide for the mongoDB database
-* `Docker run`
+// TODO: installation guide
 
 ## Context and problem to solve
 
