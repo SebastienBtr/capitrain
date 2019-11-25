@@ -16,7 +16,7 @@ def analyse_packets(pkt):
         # If we already have the stream in the dict or not
         if (pkt.tcp.stream not in packet_dict):
             # Get the remote ip of the stream
-            ip = pkt.ip.dst if pkt.ip.dst != LISTENED_IP else pkt.ip.src
+            ip = pkt.ip.src if pkt.ip.src != LISTENED_IP else pkt.ip.dst
             save_new_stream(pkt.tcp.stream, timestamp, ip, pkt)
         else:
             time_delta = float(pkt.tcp.time_delta)
