@@ -1,21 +1,13 @@
 FROM ubuntu:18.04
 
-ARG mongoDbUser
-ARG mongoDbPassword
-ARG listenedIp
-ARG snifferTimeout
-
-ENV MONGO_DB_USER $mongoDbUser
-ENV MONGO_DB_PASSWORD $mongoDbPassword
 ENV DEBIAN_FRONTEND noninteractive
-ENV LISTENED_IP $listenedIp
-ENV SNIFFER_TIMEOUT $snifferTimeout
 
-COPY requirements.txt main.py sniffer.py analyse_tcp_packets.py ./
+RUN mkdir /app/
+COPY requirements.txt db.py main.py sniffer.py analyse_tcp_packets.py /app/
 
 RUN apt-get update && apt-get install -y \
     python3-pip \
     tshark \
-    && pip3 --no-cache-dir install -r requirements.txt
+    && pip3 --no-cache-dir install -r /app/requirements.txt
 
-CMD [ "python3" , "main.py" ]
+CMD [ "python3" , "/app/main.py" ]
