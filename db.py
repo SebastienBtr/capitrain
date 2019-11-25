@@ -1,12 +1,14 @@
 import os
 import pymongo
 
+MONGO_DB_ADDRESS = os.getenv('MONGO_DB_ADDRESS')
 MONGO_DB_USER = os.getenv('MONGO_DB_USER')
 MONGO_DB_PASSWORD = os.getenv('MONGO_DB_PASSWORD')
 
+
 # Connection to mongoDB
 cluster = pymongo.MongoClient(
-    "mongodb+srv://{}:{}@cluster0-llznq.gcp.mongodb.net/test?retryWrites=true&w=majority".format(MONGO_DB_USER, MONGO_DB_PASSWORD))
+    "mongodb+srv://{}:{}@{}/test?retryWrites=true&w=majority".format(MONGO_DB_USER, MONGO_DB_PASSWORD, MONGO_DB_ADDRESS))
 capitrain_db = cluster['capitrain']
 analysed_packets = capitrain_db["analysed_packets"]
 
