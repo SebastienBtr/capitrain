@@ -3,6 +3,7 @@
 
 ### Project dependent ###
 /capture.pcap
+.env
 
 ### Linux ###
 *~
