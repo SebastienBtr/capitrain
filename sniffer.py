@@ -3,6 +3,10 @@ import pyshark
 import os
 import argparse
 
+# Check if we have the necessaries environment variables
+environment.check_sniffer_env()
+
+# Arguments available
 parser = argparse.ArgumentParser()
 parser.add_argument('--outputFile', '-of',
                     help='The name of the pcap output file, default: capture')
@@ -20,6 +24,7 @@ output_file = "capture.pcap" if args.outputFile is None else args.outputFile + "
 capture = pyshark.LiveCapture(
     interface=INTERFACE, output_file=output_file, display_filter=filter)
 
+# Launch the capture
 if args.timeout is None:
     capture.sniff()
 else:

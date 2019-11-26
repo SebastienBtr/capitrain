@@ -14,7 +14,7 @@ def connect_to_db():
         "mongodb+srv://{}:{}@{}/test?retryWrites=true&w=majority".format(MONGO_DB_USER, MONGO_DB_PASSWORD, MONGO_CLUSTER_ADDRESS))
     db = cluster[MONGO_DB_NAME]
 
-# Insert a document in our analysed_packets collection
+# Insert a document in the given collection
 def save_element(element, collection_name):
     global db
     if db is None:

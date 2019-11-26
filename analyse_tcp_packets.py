@@ -4,19 +4,7 @@ import pyshark
 import socket
 import os
 import argparse
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--captureFileName', '-cfn',
-                    help='The name of the pcap file to analyse, default: capture.pcap')
-args = parser.parse_args()
-
-LISTENED_IP = os.getenv('LISTENED_IP')
-captureFileName = "capture.pcap" if args.captureFileName is None else args.captureFileName
-
-
-# Check if capture file exists
-if not os.path.exists(captureFileName):
-    raise Exception("File {} doesn't exist".format(captureFileName))
+import csv_saver
 
 
 # Analyse a pkt to save it in the good key of our date structure
@@ -57,6 +45,7 @@ def analyse_packets(pkt):
 def get_packet_size(pkt):
     return int(pkt.length.raw_value, 16) * 0.000001
 
+
 # Save a new stream and its first packet in the dict
 def save_new_stream(stream_id, timestamp, ip, pkt):
     domain = reverse_dns(ip)
@@ -71,10 +60,15 @@ def save_new_stream(stream_id, timestamp, ip, pkt):
         'endTime': timestamp,
     }
 
+
 # Send a group of packets that seems to be together to the DB
 def push_data(key):
     print('Push data: ' + str(packet_dict[key]))
-    db.save_element(packet_dict[key], captureFileName)
+    if (args.export == "mongo"):
+        db.save_element(packet_dict[key], captureFileName)
+    else:
+        csv_saver.save_element(packet_dict[key])
+
 
 # Reverse DNS a remote IP
 def reverse_dns(ip):
@@ -84,6 +78,21 @@ def reverse_dns(ip):
     except:
         return ""
 
+
+# Arguments available
+parser = argparse.ArgumentParser()
+parser.add_argument('--captureFileName', '-cfn',
+                    help='The name of the pcap file to analyse, default: capture.pcap')
+parser.add_argument('--export', '-e',
+                    help="The export mode you want to use: mongo or csv, default: csv")
+args = parser.parse_args()
+
+LISTENED_IP = os.getenv('LISTENED_IP')
+
+captureFileName = "capture.pcap" if args.captureFileName is None else args.captureFileName
+# Check if capture file exists
+if not os.path.exists(captureFileName):
+    raise Exception("File {} doesn't exist".format(captureFileName))
 
 # Data structure
 """ packet_dict = {
@@ -100,8 +109,10 @@ def reverse_dns(ip):
 } """
 packet_dict = {}
 
-# Connect to db
-db.connect_to_db()
+# Connect to db if we are in the mongo export mode
+if (args.export == "mongo"):
+    environment.check_mongo_env()
+    db.connect_to_db()
 
 # Open the capture file
 cap = pyshark.FileCapture(captureFileName)
