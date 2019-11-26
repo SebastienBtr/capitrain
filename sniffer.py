@@ -23,4 +23,4 @@ capture = pyshark.LiveCapture(
 if args.timeout is None:
     capture.sniff()
 else:
-    capture.sniff(timeout=args.timeout)
+    capture.sniff(timeout=int(args.timeout))

@@ -74,7 +74,7 @@ def save_new_stream(stream_id, timestamp, ip, pkt):
 # Send a group of packets that seems to be together to the DB
 def push_data(key):
     print('Push data: ' + str(packet_dict[key]))
-    db.save_element(packet_dict[key], captureFileName)
+    db.save_element(packet_dict[key], captureFileName.replace('.pcap', ''))
 
 # Reverse DNS a remote IP
 def reverse_dns(ip):
