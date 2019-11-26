@@ -3,6 +3,7 @@
 ## Table of Contents
 
 *	[Installation](#installation)
+* [Usage](#usage)
 *	[Context and problem to solve](#context-and-problem-to-solve)
 *	[Explored possibilities and solution provided](#explored-possibilities-and-solution-provided)
 *	[Results](#results)
@@ -10,7 +11,21 @@
 
 ## Installation
 
-// TODO: installation guide
+* TShark installed
+* Python 3 installed
+* Run `pip3 install -r requirements.txt`
+
+## Usage
+
+To sniff data: 
+ * Add in the .env file the values for `LISTENED_IP`, `LOCAL_IP` and `INTERFACE`
+ * Run `python3 sniffer.py`, you can also provide different options, run `python3 sniffer.py -h` to see them
+ * By default the program will generate a `capture.pcap` file in the root folder
+
+To analyse sniffed data:
+  * Run `python3 analyse_tcp_packets.py`, you can also provide different options, run `python3 analyse_tcp_packets.py -h` to see them.
+  * If you choose the "mongo" export mode, you need complete the variables about mongoDB in the .env file
+  * By default the program will generate a `results.csv` file in the root folder
 
 ## Context and problem to solve
 
