@@ -16,7 +16,7 @@ LISTENED_IP = os.getenv('LISTENED_IP')
 INTERFACE = os.getenv('INTERFACE')
 LOCAL_IP = os.getenv('LOCAL_IP')
 
-filter = "tcp&&(ip.dst==" + LOCAL_IP + "||ip.src==" + LISTENED_IP + ")"
+filter = "tcp&&(ip.src!=" + LOCAL_IP + "&&ip.src!=" + LISTENED_IP + ")"
 output_file = "capture.pcap" if args.outputFile is None else args.outputFile + ".pcap"
 
 capture = pyshark.LiveCapture(
