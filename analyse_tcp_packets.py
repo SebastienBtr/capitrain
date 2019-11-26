@@ -1,13 +1,25 @@
+import environment
+import db
 import pyshark
 import socket
 import os
-from db import save_element
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--captureFileName', '-cfn',
+                    help='The name of the pcap file to analyse, default: capture.pcap')
+args = parser.parse_args()
 
 LISTENED_IP = os.getenv('LISTENED_IP')
+captureFileName = "capture.pcap" if args.captureFileName is None else args.captureFileName
+
+
+# Check if capture file exists
+if not os.path.exists(captureFileName):
+    raise Exception("File {} doesn't exist".format(captureFileName))
+
 
 # Analyse a pkt to save it in the good key of our date structure
-
-
 def analyse_packets(pkt):
     if ('TCP' in pkt and 'IP' in pkt):
         # time when the packet was received
@@ -46,8 +58,6 @@ def get_packet_size(pkt):
     return int(pkt.length.raw_value, 16) * 0.000001
 
 # Save a new stream and its first packet in the dict
-
-
 def save_new_stream(stream_id, timestamp, ip, pkt):
     domain = reverse_dns(ip)
     packet_dict[stream_id] = {
@@ -62,15 +72,11 @@ def save_new_stream(stream_id, timestamp, ip, pkt):
     }
 
 # Send a group of packets that seems to be together to the DB
-
-
 def push_data(key):
     print('Push data: ' + str(packet_dict[key]))
-    save_element(packet_dict[key])
+    db.save_element(packet_dict[key], captureFileName)
 
 # Reverse DNS a remote IP
-
-
 def reverse_dns(ip):
     try:
         reversed_dns = socket.gethostbyaddr(ip)
@@ -94,11 +100,17 @@ def reverse_dns(ip):
 } """
 packet_dict = {}
 
-cap = pyshark.FileCapture('./capture.pcap')
+# Connect to db
+db.connect_to_db()
+
+# Open the capture file
+cap = pyshark.FileCapture(captureFileName)
+
+# Launch capture file analysis
 cap.apply_on_packets(analyse_packets)
 
 # We push_data all the remaining streams in packet_dict
 for key in packet_dict:
     push_data(key)
 
-print('done')
+print('Analyse done')

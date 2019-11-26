@@ -4,12 +4,10 @@ import os
 import argparse
 
 parser = argparse.ArgumentParser()
-
 parser.add_argument('--outputFile', '-of',
                     help='The name of the pcap output file, default: capture')
 parser.add_argument(
     '--timeout', '-t', help='Timeout in seconds of the sniffer, default: no timeout')
-
 args = parser.parse_args()
 
 LISTENED_IP = os.getenv('LISTENED_IP')
