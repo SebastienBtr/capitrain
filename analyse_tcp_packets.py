@@ -65,7 +65,7 @@ def save_new_stream(stream_id, timestamp, ip, pkt):
 def push_data(key):
     print('Push data: ' + str(packet_dict[key]))
     if (args.export == "mongo"):
-        db.save_element(packet_dict[key], captureFileName)
+        db.save_element(packet_dict[key], captureFileName.replace('.pcap', ''))
     else:
         csv_saver.save_element(packet_dict[key])
 
