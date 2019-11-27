@@ -31,7 +31,7 @@ if args.protocols == "udp":
 elif args.protocols == "both":
     protocols = "tcp&&udp&&"
 else:
-    protocols = args.protocols
+    protocols = "tcp&&"
 filter = protocols + "(ip.src!=" + LOCAL_IP + "&&ip.src!=" + LISTENED_IP + ")"
 
 capture = pyshark.LiveCapture(
