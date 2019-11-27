@@ -26,9 +26,9 @@ output_file = args.outputFile + ".pcap"
 
 # Determines protocols to filter
 protocols = ""
-if args.protocols is "udp":
+if args.protocols == "udp":
     protocols = "udp&&"
-elif args.protocols is "both":
+elif args.protocols == "both":
     protocols = "tcp&&udp&&"
 else:
     protocols = args.protocols
