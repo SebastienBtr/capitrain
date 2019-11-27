@@ -8,18 +8,31 @@ environment.check_sniffer_env()
 
 # Arguments available
 parser = argparse.ArgumentParser()
-parser.add_argument('--outputFile', '-of',
-                    help='The name of the pcap output file, default: capture')
 parser.add_argument(
-    '--timeout', '-t', help='Timeout in seconds of the sniffer, default: no timeout')
+    '--outputFile', '-of', default="capture", help='The name of the pcap output file, default: capture')
+parser.add_argument(
+    '--timeout', '-t', default=None, help='Timeout in seconds of the sniffer, default: None')
+parser.add_argument(
+    '--protocols', '-p', default="tcp", help='Protocols to capture, possible values : tcp, udp and both, default: tcp')
 args = parser.parse_args()
 
+# env var
 LISTENED_IP = os.getenv('LISTENED_IP')
 INTERFACE = os.getenv('INTERFACE')
 LOCAL_IP = os.getenv('LOCAL_IP')
 
-filter = "tcp&&(ip.src!=" + LOCAL_IP + "&&ip.src!=" + LISTENED_IP + ")"
-output_file = "capture.pcap" if args.outputFile is None else args.outputFile + ".pcap"
+# Sets output file name
+output_file = args.outputFile + ".pcap"
+
+# Determines protocols to filter
+protocols = ""
+if args.protocols is "udp":
+    protocols = "udp&&"
+elif args.protocols is "both":
+    protocols = "tcp&&udp&&"
+else:
+    protocols = args.protocols
+filter = protocols + "(ip.src!=" + LOCAL_IP + "&&ip.src!=" + LISTENED_IP + ")"
 
 capture = pyshark.LiveCapture(
     interface=INTERFACE, output_file=output_file, display_filter=filter)
