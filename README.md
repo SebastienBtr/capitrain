@@ -112,7 +112,7 @@ There are still some issues with this solution, TShark provides us what they cal
 
 To do this "guessing" our program is calculating an average time delta between packets by stream dynamically. It means we update the stream's average time delta value everytime we receive a packet and we flush data when we receive a packet x times the average value later, where x is an arbitrary value that we setted to 3 but it can obviously be changed, after that we reset the average delta value.
 
-This approach is really criticable, the firsts deltas can sometimes not be representative of the rest and then the cutting will be wrong. Another solution could be to first analyse all the packets to calcul this average value (we can do multiples iterations to refine the value) before doing another analysis for the cuttings.
+This approach is really criticable, the first deltas can sometimes not be representative of the rest and then the cutting will be wrong. Another solution could be to first analyse all the packets to calcul this average value (we can do multiples iterations to refine the value) before doing another analysis for the cuttings.
 
 
 **Work based on:**
