@@ -30,7 +30,9 @@ def analyse_packets(pkt):
             ipServer = pkt.ipv6.dst if 'IPV6' in pkt else pkt.ip.dst
             save_new_stream(streamIndex, timestamp, ipClient, ipServer, pkt, protocol)
         else:
-            time_delta = float(pkt[protocol].time_delta)
+            last_time = packet_dict[streamIndex]['endTime']
+            # We don't use pkt[protocol].time_delta because it is not available in UDP
+            time_delta = abs(timestamp - last_time)
             average_delta = packet_dict[streamIndex]['averageDelta']
 
             # Based on the average delta time we split the packets
