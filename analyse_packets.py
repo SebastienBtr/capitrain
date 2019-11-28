@@ -84,15 +84,15 @@ def reverse_dns(ip):
 
 # Arguments available
 parser = argparse.ArgumentParser()
-parser.add_argument('--captureFileName', '-cfn',
+parser.add_argument('--captureFileName', '-cfn', default='capture.pcap',
                     help='The name of the pcap file to analyse, default: capture.pcap')
-parser.add_argument('--export', '-e',
+parser.add_argument('--export', '-e', default='csv',
                     help="The export mode you want to use: mongo or csv, default: csv")
 args = parser.parse_args()
 
 LISTENED_IP = os.getenv('LISTENED_IP')
 
-captureFileName = "capture.pcap" if args.captureFileName is None else args.captureFileName
+captureFileName = args.captureFileName
 # Check if capture file exists
 if not os.path.exists(captureFileName):
     raise Exception("File {} doesn't exist".format(captureFileName))
