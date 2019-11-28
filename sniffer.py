@@ -17,9 +17,11 @@ parser.add_argument(
 args = parser.parse_args()
 
 # env var
-LISTENED_IP = os.getenv('LISTENED_IP')
 INTERFACE = os.getenv('INTERFACE')
+LISTENED_IP = os.getenv('LISTENED_IP')
 LOCAL_IP = os.getenv('LOCAL_IP')
+LISTENED_IPV6 = os.getenv('LISTENED_IPV6')
+LOCAL_IPV6 = os.getenv('LOCAL_IPV6')
 
 # Sets output file name
 output_file = args.outputFile + ".pcap"
@@ -32,7 +34,14 @@ elif args.protocols is "both":
     protocols = "tcp&&udp&&"
 else:
     protocols = args.protocols
+
+# Creates filter for sniffing
 filter = protocols + "(ip.src!=" + LOCAL_IP + "&&ip.src!=" + LISTENED_IP + ")"
+
+# Modifies filter to add IPv6 if necessary
+if (LISTENED_IPV6 is not None) and (LOCAL_IPV6 is not None):
+    filter = filter + "&&(ipv6.src!=" + LOCAL_IPV6 + \
+        "&&ipv6.src!=" + LISTENED_IPV6 + ")"
 
 capture = pyshark.LiveCapture(
     interface=INTERFACE, output_file=output_file, display_filter=filter)

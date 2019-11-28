@@ -15,6 +15,27 @@
 * Python 3 installed
 * Run `pip3 install -r requirements.txt`
 
+## Environment variables
+
+### Sniffer
+
+
+
+* INTERFACE
+* LISTENED_IP
+* LOCAL_IP
+* LISTENED_IPV6
+* LOCAL_IPV6
+
+### MongoDB
+
+
+
+* MONGO_CLUSTER_ADDRESS
+* MONGO_DB_NAME
+* MONGO_DB_USER
+* MONGO_DB_PASSWORD
+
 ## Usage
 
 To sniff data: 
@@ -23,7 +44,7 @@ To sniff data:
  * By default the program will generate a `capture.pcap` file in the root folder
 
 To analyse sniffed data:
-  * Run `python3 analyse_tcp_packets.py`, you can also provide different options, run `python3 analyse_tcp_packets.py -h` to see them.
+  * Run `python3 analyse_packets.py`, you can also provide different options, run `python3 analyse_packets.py -h` to see them
   * If you choose the "mongo" export mode, you need complete the variables about mongoDB in the .env file
   * By default the program will generate a `results.csv` file in the root folder
 

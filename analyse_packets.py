@@ -17,7 +17,7 @@ def analyse_packets(pkt):
         if (pkt.tcp.stream not in packet_dict):
             # Get the remote ip of the stream
             ip = pkt.ip.src
-            save_new_stream(pkt.tcp.stream, timestamp, ip, pkt)
+            save_new_stream(pkt.tcp.stream, timestamp, ip, pkt, 'udp')
         else:
             time_delta = float(pkt.tcp.time_delta)
             average_delta = packet_dict[pkt.tcp.stream]['averageDelta']
@@ -47,7 +47,7 @@ def get_packet_size(pkt):
 
 
 # Save a new stream and its first packet in the dict
-def save_new_stream(stream_id, timestamp, ip, pkt):
+def save_new_stream(stream_id, timestamp, ip, pkt, protocol):
     domain = reverse_dns(ip)
     packet_dict[stream_id] = {
         'sumDelta': 0,
@@ -58,6 +58,7 @@ def save_new_stream(stream_id, timestamp, ip, pkt):
         'totalMbSize': get_packet_size(pkt),
         'startTime': timestamp,
         'endTime': timestamp,
+        'protocol': protocol
     }
 
 
@@ -105,6 +106,7 @@ if not os.path.exists(captureFileName):
     'totalMbSize': size in MB,
     'startTime': timestamp,
     'endTime': timestamp,
+    'protocol': string
   }
 } """
 packet_dict = {}
