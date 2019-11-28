@@ -2,6 +2,12 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
+def check_analyse_env():
+    if ((os.getenv('LOCAL_IP') is None or os.getenv('LOCAL_IP') == "")
+        and (os.getenv('LOCAL_IPV6') is None or os.getenv('LOCAL_IPV6') == "")):
+        raise Exception(
+            '\n\nPlease complete the following environment variables in the .env file:\nLOCAL_IP\n')
+    
 # Check if we have all the environment variables for the sniffer
 def check_sniffer_env():
     if (((os.getenv('LISTENED_IP') is None or os.getenv('LISTENED_IP') == "") 
