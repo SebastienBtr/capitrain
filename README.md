@@ -19,13 +19,13 @@
 ## Usage
 
 To sniff data: 
- * Add in the .env file the values for `LISTENED_IP`, `LOCAL_IP` and `INTERFACE`
+ * Add in the .env file the [variables for the sniffer](#sniffer)
  * Run `python3 sniffer.py`, you can also provide different options, run `python3 sniffer.py -h` to see them
  * By default the program will generate a `capture.pcap` file in the root folder
 
 To analyse sniffed data:
   * Run `python3 analyse_packets.py`, you can also provide different options, run `python3 analyse_packets.py -h` to see them
-  * If you choose the "mongo" export mode, you need complete the variables about mongoDB in the .env file
+  * If you choose the "mongo" export mode, you need complete the [variables about mongoDB](#mongodb) in the .env file
   * By default the program will generate a `results.csv` file in the root folder
 
 ### Schema
@@ -44,7 +44,7 @@ These variables are used for sniffing
 * LISTENED_IPV6 (optional) : script will capture packets from conversation between LISTENED_IPV6 and other addresses
 * LOCAL_IPV6 (optional) : IPv6 of the program host machine
 
-LISTENED_IP (or LISTENED_IPV6) and LOCAL_IP (or LOCAL_IPV6) can be the same if you want to capture packets from conversation between the program host machine and and other addresses
+LISTENED_IP (or LISTENED_IPV6) and LOCAL_IP (or LOCAL_IPV6) can be the same if program host machine and device are the same.
 
 ### MongoDB
 
