@@ -37,26 +37,21 @@ else:
 
 # Creates filter for sniffing
 filter = protocols
-if (LISTENED_IPV6 is None and LOCAL_IPV6 is None):
+if ((LISTENED_IPV6 is None or LISTENED_IPV6 == "") and (LOCAL_IPV6 is None or LOCAL_IPV6 == "")):
     filter += "((ip.src==" + LOCAL_IP + "&&!(ip.dst==" + LISTENED_IP + \
         "))||(ip.dst==" + LOCAL_IP + "&&!(ip.src==" + LISTENED_IP + ")))"
         
-elif (LISTENED_IPV6 is None and LOCAL_IPV6 is not None):
+elif ((LISTENED_IPV6 is None or LISTENED_IPV6 == "") and (LOCAL_IPV6 is not None and LOCAL_IPV6 != "")):
     filter += "((ipv6.src==" + LOCAL_IPV6 + "&&!(ip.dst==" + LISTENED_IP + \
         "))||(ipv6.dst==" + LOCAL_IPV6 + "&&!(ip.src==" + LISTENED_IP + ")))"
         
-elif (LISTENED_IPV6 is not None and LOCAL_IPV6 is None):
+elif ((LISTENED_IPV6 is not None and LISTENED_IPV6 != "") and (LOCAL_IPV6 is None or LOCAL_IPV6 == "")):
     filter += "((ip.src==" + LOCAL_IP + "&&!(ipv6.dst==" + LISTENED_IPV6 + \
         "))||(ip.dst==" + LOCAL_IP + "&&!(ipv6.src==" + LISTENED_IPV6 + ")))"
         
-elif (LISTENED_IPV6 is not None and LOCAL_IPV6 is not None):
+elif ((LISTENED_IPV6 is not None and LISTENED_IPV6 != "") and (LOCAL_IPV6 is not None and LOCAL_IPV6 != "")):
     filter += "((ipv6.src==" + LOCAL_IPV6 + "&&!(ipv6.dst==" + LISTENED_IPV6 + \
         "))||(ipv6.dst==" + LOCAL_IPV6 + "&&!(ipv6.src==" + LISTENED_IPV6 + ")))"
-
-# Modifies filter to add IPv6 if necessary
-if (LISTENED_IPV6 is not None) and (LOCAL_IPV6 is not None):
-    filter = filter + "&&(ipv6.src!=" + LOCAL_IPV6 + \
-        "&&ipv6.src!=" + LISTENED_IPV6 + ")"
 
 capture = pyshark.LiveCapture(
     interface=INTERFACE, output_file=output_file, display_filter=filter)
