@@ -72,7 +72,7 @@ The objective is to design and develop a tool to collect and analyse information
 The fist solution we came up with was to do a man in the middle attack thanks to a proxy. 
 For that we configured a proxy with [Burp proxy](https://portswigger.net/burp/documentation/desktop/tools/proxy) and [MITM proxy](https://mitmproxy.org/) (to test different proxies).
 
-With this solution it is easy to see all the requests and their payload in http and https in a web browser but for mobile apps it is far more difficult. For few of them it will works but nowadays more and more apps have a SSL Certificate Pinning security, it means the app will compare the public key of the server's certificate with a pinned public key the in the apk. If they are not the same the connection will be refused. Because the certificate public key from our proxy will never match the pinned key in the app, no connection can be established and we cannot see any data.
+With this solution it is easy to see all the requests and their payloads in http and https in a web browser but for mobile apps it is far more difficult. For few of them it will works but nowadays more and more apps have a SSL Certificate Pinning security, it means the app will compare the public key of the server's certificate with a pinned public key the in the apk. If they are not the same the connection will be refused. Because the certificate public key from our proxy will never match the pinned key in the app, no connection can be established and we cannot see any data.
 
 **How can we bypass this security?**
 
@@ -106,13 +106,13 @@ The second solution, and the one that is provided in this project, is to use TSh
 
 "TShark is a terminal oriented version of Wireshark designed for capturing and displaying packets when an interactive user interface isn’t necessary or available" ([from wireshark documentation](https://www.wireshark.org/docs/wsug_html_chunked/AppToolstshark.html))
 
-With this solution we cannot see all the requests and their paylods as it would be possible with the proxy solution but we have all the packets in TCP/UDP and the minimum information that we need to analyse them. To simplify our work we used pyshark, a python wrapper for TShark.
+With this solution we cannot see all the requests and their payloads as it would be possible with the proxy solution but we have all the packets in TCP/UDP and the minimum information that we need to analyse them. To simplify our work we used pyshark, a python wrapper for TShark.
 
 There are still some issues with this solution, TShark provides us what they call "streams" to separate packets from different {source, destination}, but inside a stream we cannot reassemble packets by request, we need to do it by analysing the time between packets to guess if they are together. For example, if we sniff 10 packets relatively close in the time inside a stream and then we receive nothing during 5 seconds, the next packets are probably from another request.
 
 To do this "guessing" our program is calculating an average time delta between packets by stream dynamically. It means we update the stream's average time delta value everytime we receive a packet and we flush data when we receive a packet x times the average value later, where x is an arbitrary value that we setted to 3 but it can obviously be changed, after that we reset the average delta value.
 
-This approach is really criticable, the first deltas can sometimes not be representative of the rest and then the cutting will be wrong. Another solution could be to first analyse all the packets to calcul this average value (we can do multiples iterations to refine the value) before doing another analysis for the cuttings.
+This approach is really criticizable, the first deltas can sometimes not be representative of the rest and then the cutting will be wrong. Another solution could be to first analyse all the packets to calculate this average value (we can do multiple iterations to refine the value) before doing another analysis for the cuttings.
 
 
 **Work based on:**
