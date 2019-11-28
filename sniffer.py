@@ -31,7 +31,7 @@ protocols = ""
 if args.protocols == "udp":
     protocols = "udp&&"
 elif args.protocols == "both":
-    protocols = "tcp&&udp&&"
+    protocols = "(tcp||udp)&&"
 else:
     protocols = "tcp&&"
 
