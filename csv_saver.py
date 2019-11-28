@@ -1,7 +1,7 @@
 import csv
 import os
 
-csv_columns = ['ipSrc', 'ipDst', 'domainSrc', 'domainDst', 
+csv_columns = ['ipClient', 'ipServer', 'domainSrc', 'domainDst', 
                'numberOfPackets', 'totalMbSize', 'startTime', 'endTime', 'protocol']
 
 # Insert a row in the results csv file

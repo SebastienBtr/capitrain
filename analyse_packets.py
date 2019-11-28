@@ -26,9 +26,9 @@ def analyse_packets(pkt):
         # If we already have the stream in the dict or not
         if (streamIndex not in packet_dict):
             # Get the remote ip of the stream
-            ipSrc = pkt.ipv6.src if 'IPV6' in pkt else pkt.ip.src
-            ipDst = pkt.ipv6.dst if 'IPV6' in pkt else pkt.ip.dst
-            save_new_stream(streamIndex, timestamp, ipSrc, ipDst, pkt, protocol)
+            ipClient = pkt.ipv6.src if 'IPV6' in pkt else pkt.ip.src
+            ipServer = pkt.ipv6.dst if 'IPV6' in pkt else pkt.ip.dst
+            save_new_stream(streamIndex, timestamp, ipClient, ipServer, pkt, protocol)
         else:
             time_delta = float(pkt[protocol].time_delta)
             average_delta = packet_dict[streamIndex]['averageDelta']
@@ -58,14 +58,14 @@ def get_packet_size(pkt):
 
 
 # Save a new stream and its first packet in the dict
-def save_new_stream(stream_id, timestamp, ipSrc, ipDst, pkt, protocol):
-    domainSrc = reverse_dns(ipSrc)
-    domainDst = reverse_dns(ipDst)
+def save_new_stream(stream_id, timestamp, ipClient, ipServer, pkt, protocol):
+    domainSrc = reverse_dns(ipClient)
+    domainDst = reverse_dns(ipServer)
     packet_dict[stream_id] = {
         'sumDelta': 0,
         'averageDelta': 0,
-        'ipSrc': ipSrc,
-        'ipDst': ipDst,
+        'ipClient': ipClient,
+        'ipServer': ipServer,
         'domainSrc': domainSrc,
         'domainDst': domainDst,
         'numberOfPackets': 1,
