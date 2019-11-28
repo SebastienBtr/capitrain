@@ -25,7 +25,7 @@ To sniff data:
 
 To analyse sniffed data:
   * Run `python3 analyse_packets.py`, you can also provide different options, run `python3 analyse_packets.py -h` to see them
-  * If you choose the "mongo" export mode, you need complete the [variables about mongoDB](#mongodb) in the .env file
+  * If you choose the "mongo" export mode, you need to complete the [variables about mongoDB](#mongodb) in the .env file
   * By default the program will generate a `results.csv` file in the root folder
 
 ### Schema
@@ -38,22 +38,22 @@ To analyse sniffed data:
 
 These variables are used for sniffing
 
-* INTERFACE : name of the network interface to listen
-* LISTENED_IP : script will capture packets from conversation between LISTENED_IP and other addresses
-* LOCAL_IP : IP of the program host machine
-* LISTENED_IPV6 (optional) : script will capture packets from conversation between LISTENED_IPV6 and other addresses
-* LOCAL_IPV6 (optional) : IPv6 of the program host machine
+* `INTERFACE` : name of the network interface to listen
+* `LISTENED_IP` : script will capture packets from conversation between LISTENED_IP and other addresses
+* `LOCAL_IP` : IP of the program host machine
+* `LISTENED_IPV6` (optional) : script will capture packets from conversation between LISTENED_IPV6 and other addresses
+* `LOCAL_IPV6` (optional) : IPv6 of the program host machine
 
-LISTENED_IP (or LISTENED_IPV6) and LOCAL_IP (or LOCAL_IPV6) can be the same if program host machine and device are the same.
+`LISTENED_IP` (or `LISTENED_IPV6`) and `LOCAL_IP` (or `LOCAL_IPV6`) can be the same if program host machine and device are the same.
 
 ### MongoDB
 
 These variables are only used for analysing in "mongo" export mode
 
-* MONGO_CLUSTER_ADDRESS
-* MONGO_DB_NAME
-* MONGO_DB_USER
-* MONGO_DB_PASSWORD
+* `MONGO_CLUSTER_ADDRESS`
+* `MONGO_DB_NAME`
+* `MONGO_DB_USER`
+* `MONGO_DB_PASSWORD`
 
 ## Context and problem to solve
 
@@ -70,9 +70,9 @@ The objective is to design and develop a tool to collect and analyse information
 ### 1 - MITM attack with a Proxy
 
 The fist solution we came up with was to do a man in the middle attack thanks to a proxy. 
-For that we configured a proxy with [Burp proxy](https://portswigger.net/burp/documentation/desktop/tools/proxy) and [MITM proxy](https://mitmproxy.org/) (to test different proxies)
+For that we configured a proxy with [Burp proxy](https://portswigger.net/burp/documentation/desktop/tools/proxy) and [MITM proxy](https://mitmproxy.org/) (to test different proxies).
 
-With this solution it is easy to see all the request and their payload in http and https in a web browser but for mobile apps it is far more difficult. For few of them it will works but nowadays more and more apps have a SSL Certificate pinning security, it means the app will compare the public key of the server's certificate with a pinned public key the in the apk. If they are not the same the connection will be refused. Because the certificate public key from our proxy will never will never match the pinned key in the app, no connection can be established and we cannot see any data.
+With this solution it is easy to see all the requests and their payload in http and https in a web browser but for mobile apps it is far more difficult. For few of them it will works but nowadays more and more apps have a SSL Certificate Pinning security, it means the app will compare the public key of the server's certificate with a pinned public key the in the apk. If they are not the same the connection will be refused. Because the certificate public key from our proxy will never match the pinned key in the app, no connection can be established and we cannot see any data.
 
 **How can we bypass this security?**
 
@@ -82,7 +82,7 @@ There are several tools that promise to bypass the SSL Certificate Pinning, we t
 
 **Is there any other solution?**
 
-Yes, but you need to be really motivated and it might stil not works. What you can do is to decompile the apk (with frida-tools) and search for lines in the obfuscaded code that seems to be related to the certificate and change them to always return true. As you can guess, famous apps are doing a hard work to prevent you to do these kind of hacky manipulation.
+Yes, but you need to be really motivated and it might still not works. What you can do is to decompile the apk (with frida-tools) and search for lines in the obfuscaded code that seems to be related to the certificate and change them to always return true. As you can guess, famous apps are doing a hard work to prevent you to do these kind of hacky manipulations.
 
 At this point we decided to stop investigating in this solution and to start working on another one.
 
@@ -102,13 +102,18 @@ Work based on:
 
 ### 2 - Network sniffer with a TShark wrapper
 
-The second solution, and the one that is provided in this project is to use TShark.
+The second solution, and the one that is provided in this project, is to use TShark.
 
 "TShark is a terminal oriented version of Wireshark designed for capturing and displaying packets when an interactive user interface isn’t necessary or available" ([from wireshark documentation](https://www.wireshark.org/docs/wsug_html_chunked/AppToolstshark.html))
 
-With this solution we cannot see all the request and their paylods as it would be possible with the proxy solution but we have all the packets in TCP/UDP and the minimum information that we need to analyse them.
+With this solution we cannot see all the requests and their paylods as it would be possible with the proxy solution but we have all the packets in TCP/UDP and the minimum information that we need to analyse them. To simplify our work we used pyshark, a python wrapper for TShark.
 
-//TODO: add more info
+There are still some issues with this solution, TShark provides us what they call "streams" to separate packets from different {source, destination}, but inside a stream we cannot reassemble packets by request, we need to do it by analysing the time between packets to guess if they are together. For example, if we sniff 10 packets relatively close in the time inside a stream and then we receive nothing during 5 seconds, the next packets are probably from another request.
+
+To do this "guessing" our program is calculating an average time delta between packets by stream dynamically. It means we update the stream's average time delta value everytime we receive a packet and we flush data when we receive a packet x times the average value later, where x is an arbitrary value that we setted to 3 but it can obviously be changed, after that we reset the average delta value.
+
+This approach is really criticable, the firsts deltas can sometimes not be representative of the rest and then the cutting will be wrong. Another solution could be to first analyse all the packets to calcul this average value (we can do multiples iterations to refine the value) before doing another analysis for the cuttings.
+
 
 **Work based on:**
   * https://www.geeek.org/iphone-analyse-trafic-reseau-application-mobile-ios-177/
