@@ -9,35 +9,45 @@ import csv_saver
 
 # Analyse a pkt to save it in the good key of our date structure
 def analyse_packets(pkt):
-    if ('TCP' in pkt and ('IP' in pkt or 'IPV6' in pkt)):
+    if (('TCP' in pkt or 'UDP' in pkt) and ('IP' in pkt or 'IPV6' in pkt)):
         # time when the packet was received
         timestamp = float(pkt.sniff_timestamp)
-
+        
+        # A stream index is an id for stream between ipA:portA and ipB:portB
+        streamIndex = -1
+        protocol = ''
+        if 'TCP' in pkt:
+            streamIndex = str(pkt.tcp.stream)
+            protocol = 'tcp'
+        else:
+            streamIndex = pkt.udp.stream
+            protocol = 'udp'
+        
         # If we already have the stream in the dict or not
-        if (pkt.tcp.stream not in packet_dict):
+        if (streamIndex not in packet_dict):
             # Get the remote ip of the stream
             ip = pkt.ipv6.src if 'IPV6' in pkt else pkt.ip.src
-            save_new_stream(pkt.tcp.stream, timestamp, ip, pkt, 'udp')
+            save_new_stream(streamIndex, timestamp, ip, pkt, protocol)
         else:
-            time_delta = float(pkt.tcp.time_delta)
-            average_delta = packet_dict[pkt.tcp.stream]['averageDelta']
+            time_delta = float(pkt[protocol].time_delta)
+            average_delta = packet_dict[streamIndex]['averageDelta']
 
             # Based on the average delta time we split the packets
             if (average_delta != 0 and time_delta > average_delta * 3):
-                push_data(pkt.tcp.stream)
-                del packet_dict[pkt.tcp.stream]
+                push_data(streamIndex)
+                del packet_dict[streamIndex]
             else:
                 # Update the delta average
-                sum_delta = packet_dict[pkt.tcp.stream]['sumDelta'] + time_delta
-                number_of_packets = packet_dict[pkt.tcp.stream]['numberOfPackets'] + 1
+                sum_delta = packet_dict[streamIndex]['sumDelta'] + time_delta
+                number_of_packets = packet_dict[streamIndex]['numberOfPackets'] + 1
                 average_delta = sum_delta / number_of_packets
 
                 # Save the new data of the stream
-                packet_dict[pkt.tcp.stream]['endTime'] = timestamp
-                packet_dict[pkt.tcp.stream]['sumDelta'] = sum_delta
-                packet_dict[pkt.tcp.stream]['numberOfPackets'] = number_of_packets
-                packet_dict[pkt.tcp.stream]['averageDelta'] = average_delta
-                packet_dict[pkt.tcp.stream]['totalMbSize'] += get_packet_size(
+                packet_dict[streamIndex]['endTime'] = timestamp
+                packet_dict[streamIndex]['sumDelta'] = sum_delta
+                packet_dict[streamIndex]['numberOfPackets'] = number_of_packets
+                packet_dict[streamIndex]['averageDelta'] = average_delta
+                packet_dict[streamIndex]['totalMbSize'] += get_packet_size(
                     pkt)
 
 
@@ -89,8 +99,6 @@ parser.add_argument('--captureFileName', '-cfn', default='capture.pcap',
 parser.add_argument('--export', '-e', default='csv',
                     help="The export mode you want to use: mongo or csv, default: csv")
 args = parser.parse_args()
-
-LISTENED_IP = os.getenv('LISTENED_IP')
 
 captureFileName = args.captureFileName
 # Check if capture file exists
