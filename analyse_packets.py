@@ -9,14 +9,14 @@ import csv_saver
 
 # Analyse a pkt to save it in the good key of our date structure
 def analyse_packets(pkt):
-    if ('TCP' in pkt and 'IP' in pkt):
+    if ('TCP' in pkt and ('IP' in pkt or 'IPV6' in pkt)):
         # time when the packet was received
         timestamp = float(pkt.sniff_timestamp)
 
         # If we already have the stream in the dict or not
         if (pkt.tcp.stream not in packet_dict):
             # Get the remote ip of the stream
-            ip = pkt.ip.src
+            ip = pkt.ipv6.src if 'IPV6' in pkt else pkt.ip.src
             save_new_stream(pkt.tcp.stream, timestamp, ip, pkt, 'udp')
         else:
             time_delta = float(pkt.tcp.time_delta)
@@ -65,6 +65,8 @@ def save_new_stream(stream_id, timestamp, ip, pkt, protocol):
 # Send a group of packets that seems to be together to the DB
 def push_data(key):
     print('Push data: ' + str(packet_dict[key]))
+    del packet_dict[key]['sumDelta']
+    del packet_dict[key]['averageDelta']
     if (args.export == "mongo"):
         db.save_element(packet_dict[key], captureFileName.replace('.pcap', ''))
     else:

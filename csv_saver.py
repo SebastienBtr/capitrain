@@ -1,8 +1,8 @@
 import csv
 import os
 
-csv_columns = ['sumDelta', 'averageDelta', 'ip', 'domain',
-               'numberOfPackets', 'totalMbSize', 'startTime', 'endTime']
+csv_columns = ['ip', 'domain',
+               'numberOfPackets', 'totalMbSize', 'startTime', 'endTime', 'protocol']
 
 # Insert a row in the results csv file
 def save_element(element):
