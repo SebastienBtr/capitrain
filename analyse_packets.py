@@ -26,9 +26,13 @@ def analyse_packets(pkt):
         # If we already have the stream in the dict or not
         if (streamIndex not in packet_dict):
             # Get the remote ip of the stream
-            ipClient = pkt.ipv6.src if 'IPV6' in pkt else pkt.ip.src
-            ipServer = pkt.ipv6.dst if 'IPV6' in pkt else pkt.ip.dst
-            save_new_stream(streamIndex, timestamp, ipClient, ipServer, pkt, protocol)
+            ip = ''
+            if ('IPV6' in pkt):
+                ip = pkt.ipv6.src if pkt.ipv6.src != LOCAL_IP else pkt.ipv6.dst
+            else:
+                ip = pkt.ip.src if pkt.ip.src != LOCAL_IP else pkt.ip.dst
+                
+            save_new_stream(streamIndex, timestamp, ip, pkt, protocol)
         else:
             last_time = packet_dict[streamIndex]['endTime']
             # We don't use pkt[protocol].time_delta because it is not available in UDP
@@ -60,16 +64,13 @@ def get_packet_size(pkt):
 
 
 # Save a new stream and its first packet in the dict
-def save_new_stream(stream_id, timestamp, ipClient, ipServer, pkt, protocol):
-    domainSrc = reverse_dns(ipClient)
-    domainDst = reverse_dns(ipServer)
+def save_new_stream(stream_id, timestamp, ip, pkt, protocol):
+    domain = reverse_dns(ip)
     packet_dict[stream_id] = {
         'sumDelta': 0,
         'averageDelta': 0,
-        'ipClient': ipClient,
-        'ipServer': ipServer,
-        'domainSrc': domainSrc,
-        'domainDst': domainDst,
+        'ip': ip,
+        'domain': domain,
         'numberOfPackets': 1,
         'totalMbSize': get_packet_size(pkt),
         'startTime': timestamp,
@@ -97,6 +98,11 @@ def reverse_dns(ip):
     except:
         return ""
 
+# Check if we have the necessaries environment variables
+environment.check_analyse_env()
+
+# env var
+LOCAL_IP = os.getenv('LOCAL_IP')
 
 # Arguments available
 parser = argparse.ArgumentParser()
