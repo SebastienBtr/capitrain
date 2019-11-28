@@ -36,7 +36,22 @@ else:
     protocols = "tcp&&"
 
 # Creates filter for sniffing
-filter = protocols + "(ip.src!=" + LOCAL_IP + "&&ip.src!=" + LISTENED_IP + ")"
+filter = protocols
+if (LISTENED_IPV6 is None and LOCAL_IPV6 is None):
+    filter += "((ip.src==" + LOCAL_IP + "&&!(ip.dst==" + LISTENED_IP + \
+        "))||(ip.dst==" + LOCAL_IP + "&&!(ip.src==" + LISTENED_IP + ")))"
+        
+elif (LISTENED_IPV6 is None and LOCAL_IPV6 is not None):
+    filter += "((ipv6.src==" + LOCAL_IPV6 + "&&!(ip.dst==" + LISTENED_IP + \
+        "))||(ipv6.dst==" + LOCAL_IPV6 + "&&!(ip.src==" + LISTENED_IP + ")))"
+        
+elif (LISTENED_IPV6 is not None and LOCAL_IPV6 is None):
+    filter += "((ip.src==" + LOCAL_IP + "&&!(ipv6.dst==" + LISTENED_IPV6 + \
+        "))||(ip.dst==" + LOCAL_IP + "&&!(ipv6.src==" + LISTENED_IPV6 + ")))"
+        
+elif (LISTENED_IPV6 is not None and LOCAL_IPV6 is not None):
+    filter += "((ipv6.src==" + LOCAL_IPV6 + "&&!(ipv6.dst==" + LISTENED_IPV6 + \
+        "))||(ipv6.dst==" + LOCAL_IPV6 + "&&!(ipv6.src==" + LISTENED_IPV6 + ")))"
 
 # Modifies filter to add IPv6 if necessary
 if (LISTENED_IPV6 is not None) and (LOCAL_IPV6 is not None):
